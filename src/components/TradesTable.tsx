@@ -18,6 +18,11 @@ export default function PublicTrades({ smallScreen }) {
   const { baseCurrency, quoteCurrency, market } = useMarket();
   const [trades, loaded] = useBonfidaTrades();
 
+  const minOrderSize =
+    market?.baseDecimals && Math.pow(10, market?.baseDecimals);
+
+  const tickSize = market?.quoteDecimals && Math.pow(10, market.quoteDecimals);
+
   return (
     <FloatingElement
       style={
@@ -59,17 +64,13 @@ export default function PublicTrades({ smallScreen }) {
                   color: trade.side === 'buy' ? '#41C77A' : '#F23B69',
                 }}
               >
-                {market?.tickSize && !isNaN(trade.price)
-                  ? Number(trade.price).toFixed(
-                      getDecimalCount(market.tickSize),
-                    )
+                {tickSize && !isNaN(trade.price)
+                  ? Number(trade.price).toFixed(getDecimalCount(tickSize))
                   : trade.price}
               </Col>
               <Col span={8} style={{ textAlign: 'right' }}>
-                {market?.minOrderSize && !isNaN(trade.size)
-                  ? Number(trade.size).toFixed(
-                      getDecimalCount(market.minOrderSize),
-                    )
+                {minOrderSize && !isNaN(trade.size)
+                  ? Number(trade.size).toFixed(getDecimalCount(minOrderSize))
                   : trade.size}
               </Col>
               <Col span={8} style={{ textAlign: 'right', color: '#434a59' }}>

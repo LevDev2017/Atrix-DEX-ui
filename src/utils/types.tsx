@@ -1,7 +1,8 @@
 import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
 import { Market, OpenOrders } from '@project-serum/serum';
-import { Event } from '@project-serum/serum/lib/queue';
-import { Order } from '@project-serum/serum/lib/market';
+// import { Event } from '@bonfida/aaob';
+// import { Order } from '@project-serum/serum/lib/market';
+import { Order } from './markets';
 import { WalletAdapter } from '../wallet-adapters';
 
 export interface ConnectionContextValues {
@@ -65,12 +66,12 @@ export interface TokenAccount {
   effectiveMint: PublicKey;
 }
 
-export interface Trade extends Event {
-  side: string;
-  price: number;
-  feeCost: number;
-  size: number;
-}
+// export interface Trade extends Event {
+//   side: string;
+//   price: number;
+//   feeCost: number;
+//   size: number;
+// }
 
 export interface OrderWithMarket extends Order {
   marketName: string;

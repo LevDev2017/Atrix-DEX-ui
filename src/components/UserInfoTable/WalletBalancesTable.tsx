@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import DataTable from '../layout/DataTable';
 import { Button, Row } from 'antd';
-import { settleAllFunds } from '../../utils/send';
+// import { settleAllFunds } from '../../utils/send';
 import { notify } from '../../utils/notifications';
 import { useConnection } from '../../utils/connection';
 import { useWallet } from '../../utils/wallet';
@@ -60,13 +60,13 @@ export default function WalletBalancesTable({
         });
         return;
       }
-      await settleAllFunds({
-        connection,
-        tokenAccounts,
-        selectedTokenAccounts,
-        wallet,
-        markets: allMarkets.map((marketInfo) => marketInfo.market),
-      });
+      // await settleAllFunds({
+      //   connection,
+      //   tokenAccounts,
+      //   selectedTokenAccounts,
+      //   wallet,
+      //   markets: allMarkets.map((marketInfo) => marketInfo.market),
+      // });
     } catch (e) {
       notify({
         message: 'Error settling funds',

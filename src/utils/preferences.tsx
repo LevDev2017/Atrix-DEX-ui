@@ -1,15 +1,12 @@
-import React, {useContext, useState} from 'react';
-import {sleep, useLocalStorageState} from './utils';
-import {useInterval} from './useInterval';
-import {useConnection} from './connection';
-import {useWallet} from './wallet';
-import {
-  useMarketInfos,
-  useTokenAccounts,
-} from './markets';
-import {settleAllFunds} from './send';
-import {PreferencesContextValues} from './types';
-import {Market} from "@project-serum/serum";
+import React, { useContext, useState } from 'react';
+import { sleep, useLocalStorageState } from './utils';
+import { useInterval } from './useInterval';
+import { useConnection } from './connection';
+import { useWallet } from './wallet';
+import { useMarketInfos, useTokenAccounts } from './markets';
+// import { settleAllFunds } from './send';
+import { PreferencesContextValues } from './types';
+import { Market } from '@project-serum/serum';
 
 export const AUTO_SETTLE_DISABLED_OVERRIDE = true;
 
@@ -26,41 +23,39 @@ export function PreferencesProvider({ children }) {
   const [tokenAccounts] = useTokenAccounts();
   const { connected, wallet } = useWallet();
   const marketInfoList = useMarketInfos();
-  const [currentlyFetchingMarkets, setCurrentlyFetchingMarkets] = useState<boolean>(false);
-  const [markets, setMarkets] = useState<Map<string, Market>>(new Map())
+  const [
+    currentlyFetchingMarkets,
+    setCurrentlyFetchingMarkets,
+  ] = useState<boolean>(false);
+  const [markets, setMarkets] = useState<Map<string, Market>>(new Map());
   const addToMarketsMap = (marketId, market) => {
-    setMarkets(prev => new Map(prev).set(marketId, market));
-  }
+    setMarkets((prev) => new Map(prev).set(marketId, market));
+  };
   const connection = useConnection();
 
   useInterval(() => {
     const autoSettle = async () => {
-			if (AUTO_SETTLE_DISABLED_OVERRIDE) {
-				return;
-			}
+      if (AUTO_SETTLE_DISABLED_OVERRIDE) {
+        return;
+      }
       if (!wallet) {
         return;
       }
       try {
         console.log('Settling funds...');
-        await settleAllFunds({
-          connection,
-          wallet,
-          tokenAccounts: tokenAccounts || [],
-          markets: [...markets.values()],
-        });
+        // await settleAllFunds({
+        //   connection,
+        //   wallet,
+        //   tokenAccounts: tokenAccounts || [],
+        //   markets: [...markets.values()],
+        // });
       } catch (e) {
         console.log('Error auto settling funds: ' + e.message);
         return;
       }
       console.log('Finished settling funds.');
     };
-    (
-      connected &&
-      wallet?.autoApprove &&
-      autoSettleEnabled &&
-      autoSettle()
-    );
+    connected && wallet?.autoApprove && autoSettleEnabled && autoSettle();
   }, 20000);
 
   // warms up the market and open orders cache for auto-settlement
@@ -76,7 +71,7 @@ export function PreferencesProvider({ children }) {
           continue;
         }
         try {
-          const market = await Market.load(connection, marketInfo.address, {}, marketInfo.programId)
+          const market = await Market.load(connection, marketInfo.address);
           addToMarketsMap(marketInfo.address.toString(), market);
           await sleep(1000);
         } catch (e) {
@@ -84,15 +79,13 @@ export function PreferencesProvider({ children }) {
         }
       }
       setCurrentlyFetchingMarkets(false);
-    }
-    (
-      connected &&
+    };
+    connected &&
       wallet?.autoApprove &&
       autoSettleEnabled &&
       !currentlyFetchingMarkets &&
-      fetchMarkets()
-    );
-  }, 60000)
+      fetchMarkets();
+  }, 60000);
 
   return (
     <PreferencesContext.Provider

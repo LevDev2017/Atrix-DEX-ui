@@ -3,7 +3,7 @@ import React, { ReactElement, useMemo, useState } from 'react';
 import { useAccountInfo } from '../utils/connection';
 import { isValidPublicKey } from '../utils/utils';
 import { ValidateStatus } from 'antd/lib/form/FormItem';
-import { TokenInstructions } from '@project-serum/serum';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { parseTokenMintData, useMintToTickers } from '../utils/tokens';
 import { AutoComplete, Form, Tooltip } from 'antd';
 import Link from './Link';
@@ -50,7 +50,7 @@ export function useMintInput(
       hasFeedback = true;
       if (accountInfo) {
         if (
-          accountInfo.owner.equals(TokenInstructions.TOKEN_PROGRAM_ID) &&
+          accountInfo.owner.equals(TOKEN_PROGRAM_ID) &&
           accountInfo.data.length === 82
         ) {
           let parsed = parseTokenMintData(accountInfo.data);

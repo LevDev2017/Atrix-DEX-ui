@@ -1,5 +1,5 @@
-import {Button, Input, Radio, Slider, Switch} from 'antd';
-import React, {useEffect, useState} from 'react';
+import { Button, Input, Radio, Slider, Switch } from 'antd';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   useFeeDiscountKeys,
@@ -12,14 +12,18 @@ import {
   useSelectedQuoteCurrencyAccount,
   useSelectedQuoteCurrencyBalances,
 } from '../utils/markets';
-import {useWallet} from '../utils/wallet';
-import {notify} from '../utils/notifications';
-import {floorToDecimal, getDecimalCount, roundToDecimal,} from '../utils/utils';
-import {useSendConnection} from '../utils/connection';
+import { useWallet } from '../utils/wallet';
+import { notify } from '../utils/notifications';
+import {
+  floorToDecimal,
+  getDecimalCount,
+  roundToDecimal,
+} from '../utils/utils';
+import { useSendConnection } from '../utils/connection';
 import FloatingElement from './layout/FloatingElement';
-import {getUnixTs, placeOrder} from '../utils/send';
-import {SwitchChangeEventHandler} from 'antd/es/switch';
-import {refreshCache} from '../utils/fetch-loop';
+import { getUnixTs, placeOrder } from '../utils/send';
+import { SwitchChangeEventHandler } from 'antd/es/switch';
+import { refreshCache } from '../utils/fetch-loop';
 import tuple from 'immutable-tuple';
 
 const SellButton = styled(Button)`
@@ -79,11 +83,15 @@ export default function TradeForm({
       ? market.quoteSplSizeToNumber(openOrdersAccount.quoteTokenFree)
       : 0;
 
+  const minOrderSize =
+    market?.baseDecimals && Math.pow(10, market?.baseDecimals);
+
+  const tickSize = market?.quoteDecimals && Math.pow(10, market.quoteDecimals);
+
   let quoteBalance = (quoteCurrencyBalances || 0) + (availableQuote || 0);
   let baseBalance = baseCurrencyBalances || 0;
-  let sizeDecimalCount =
-    market?.minOrderSize && getDecimalCount(market.minOrderSize);
-  let priceDecimalCount = market?.tickSize && getDecimalCount(market.tickSize);
+  let sizeDecimalCount = minOrderSize && getDecimalCount(minOrderSize);
+  let priceDecimalCount = tickSize && getDecimalCount(tickSize);
 
   const publicKey = wallet?.publicKey;
 
@@ -102,31 +110,31 @@ export default function TradeForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [price, baseSize]);
 
-  useEffect(() => {
-    const warmUpCache = async () => {
-      try {
-        if (!wallet || !publicKey || !market) {
-          console.log(`Skipping refreshing accounts`);
-          return;
-        }
-        const startTime = getUnixTs();
-        console.log(`Refreshing accounts for ${market.address}`);
-        await market?.findOpenOrdersAccountsForOwner(sendConnection, publicKey);
-        await market?.findBestFeeDiscountKey(sendConnection, publicKey);
-        const endTime = getUnixTs();
-        console.log(
-          `Finished refreshing accounts for ${market.address} after ${
-            endTime - startTime
-          }`,
-        );
-      } catch (e) {
-        console.log(`Encountered error when refreshing trading accounts: ${e}`);
-      }
-    };
-    warmUpCache();
-    const id = setInterval(warmUpCache, 30_000);
-    return () => clearInterval(id);
-  }, [market, sendConnection, wallet, publicKey]);
+  // useEffect(() => {
+  //   const warmUpCache = async () => {
+  //     try {
+  //       if (!wallet || !publicKey || !market) {
+  //         console.log(`Skipping refreshing accounts`);
+  //         return;
+  //       }
+  //       const startTime = getUnixTs();
+  //       console.log(`Refreshing accounts for ${market.address}`);
+  //       await market?.findOpenOrdersAccountForOwner(sendConnection, publicKey);
+  //       await market?.findBestFeeDiscountKey(sendConnection, publicKey);
+  //       const endTime = getUnixTs();
+  //       console.log(
+  //         `Finished refreshing accounts for ${market.address} after ${
+  //           endTime - startTime
+  //         }`,
+  //       );
+  //     } catch (e) {
+  //       console.log(`Encountered error when refreshing trading accounts: ${e}`);
+  //     }
+  //   };
+  //   warmUpCache();
+  //   const id = setInterval(warmUpCache, 30_000);
+  //   return () => clearInterval(id);
+  // }, [market, sendConnection, wallet, publicKey]);
 
   const onSetBaseSize = (baseSize: number | undefined) => {
     setBaseSize(baseSize);
@@ -264,6 +272,7 @@ export default function TradeForm({
       console.warn(e);
       notify({
         message: 'Error placing order',
+        // @ts-ignore
         description: e.message,
         type: 'error',
       });
@@ -317,7 +326,7 @@ export default function TradeForm({
           }
           value={price}
           type="number"
-          step={market?.tickSize || 1}
+          step={tickSize || 1}
           onChange={(e) => setPrice(parseFloat(e.target.value))}
         />
         <Input.Group compact style={{ paddingBottom: 8 }}>
@@ -329,7 +338,7 @@ export default function TradeForm({
             }
             value={baseSize}
             type="number"
-            step={market?.minOrderSize || 1}
+            step={minOrderSize || 1}
             onChange={(e) => onSetBaseSize(parseFloat(e.target.value))}
           />
           <Input
@@ -341,7 +350,7 @@ export default function TradeForm({
             }
             value={quoteSize}
             type="number"
-            step={market?.minOrderSize || 1}
+            step={minOrderSize || 1}
             onChange={(e) => onSetQuoteSize(parseFloat(e.target.value))}
           />
         </Input.Group>
