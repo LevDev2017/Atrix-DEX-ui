@@ -19,13 +19,13 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
 import BN from 'bn.js';
-import {
-  Market,
-  OpenOrders,
-  OrderType,
-  SelfTradeBehavior,
-  Side,
-} from '@project-serum/serum';
+// import {
+//   Market,
+//   OpenOrders,
+//   OrderType,
+//   SelfTradeBehavior,
+//   Side,
+// } from '@project-serum/serum';
 import { SelectedTokenAccounts, TokenAccount } from './types';
 import { Buffer } from 'buffer';
 import assert from 'assert';

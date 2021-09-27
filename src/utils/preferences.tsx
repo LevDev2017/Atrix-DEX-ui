@@ -6,7 +6,7 @@ import { useWallet } from './wallet';
 import { useMarketInfos, useTokenAccounts } from './markets';
 // import { settleAllFunds } from './send';
 import { PreferencesContextValues } from './types';
-import { Market } from '@project-serum/serum';
+// import { Market } from '@project-serum/serum';
 
 export const AUTO_SETTLE_DISABLED_OVERRIDE = true;
 
